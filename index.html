@@ -1,24 +1,87 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>AR Free-Space Canvas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <script>
+      // JavaScript to handle placing objects in the world
+      document.addEventListener('DOMContentLoaded', () => {
+        const sceneEl = document.querySelector('a-scene');
+        
+        // This event fires when the user taps on a detected real-world surface.
+        sceneEl.addEventListener('ar-hit-test-select', (event) => {
+          // The hit-test gives us the position and rotation in the real world.
+          const aRTransform = event.detail.transform;
+
+          // Create a new entity for our object
+          const newObject = document.createElement('a-entity');
+
+          // Set the 3D model
+          // IMPORTANT: Change 'gltf-model' to your desired model path
+          newObject.setAttribute('gltf-model', 'url(https://cdn.glitch.global/d8c1ba14-2630-464a-9e11-536c459f37c3/astronaut.glb?v=1680138988241)');
+          
+          // Set the scale
+          newObject.setAttribute('scale', '0.3 0.3 0.3');
+
+          // Set the position and rotation from the hit-test
+          newObject.setAttribute('position', aRTransform.position);
+          newObject.setAttribute('rotation', aRTransform.rotation);
+          
+          // Add the new object to the scene
+          sceneEl.appendChild(newObject);
+        });
+      });
+    </script>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind; maxTrack: 1;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-      
+    <a-scene
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;"
+      ar-hit-test="enabled: false;"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <a-assets>
+        </a-assets>
+
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        
-        <a-gltf-model src="https://cdn.glitch.com/b54934d9-5fbe-4438-a136-765c9ac02315%2Fbear.glb?v=1635824901026" position="0 0 0.1" scale="0.1 0.1 0.1" animation-mixer>
-        </a-gltf-model>
-
-        <a-text value="Hello, Augmented Reality!" color="white" align="center" position="0 0.5 0" width="2"></a-text>
-
+      <a-entity id="posterAnchor" mindar-image-target="targetIndex: 0">
+        <a-plane
+          position="0 0 0"
+          height="0.55"
+          width="1"
+          color="black"
+          opacity="0.5"
+        ></a-plane>
+        <a-text
+          value="Poster detected! Tap a surface to place an object."
+          color="white"
+          align="center"
+          position="0 0.1 0"
+          width="1.5"
+        ></a-text>
       </a-entity>
-    </a-scene>
 
-    </body>
+      <a-entity
+        id="placementCursor"
+        ar-hit-test="target: #posterAnchor"
+        cursor
+        raycaster="objects: .collidable"
+      >
+        <a-ring
+          radius-inner="0.1"
+          radius-outer="0.15"
+          rotation="-90 0 0"
+          color="teal"
+        ></a-ring>
+      </a-entity>
+
+    </a-scene>
+  </body>
 </html>
