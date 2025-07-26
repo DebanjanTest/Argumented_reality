@@ -7,17 +7,14 @@
     <a-scene embedded arjs>
 
       <a-assets>
-        <video id="ai-overview-video" src="./assets/videos/overview.mp4" loop="true" playsinline webkit-playsinline></video>
-        
-        <a-asset-item id="brain-model" src="./assets/models/brain.glb"></a-asset-item>
-
-        <img id="nlp-explanation" src="./assets/images/nlp-text.png">
+        <a-asset-item id="astronaut-model" src="./assets/astronaut.glb"></a-asset-item>
+        <a-asset-item id="frame-model" src="./assets/picture-frame.glb"></a-asset-item>
       </a-assets>
 
       
-      <a-marker type="pattern" url="./assets/patt/full-poster.patt">
+      <a-marker type="pattern" url="./assets/Full_poster.patt">
         <a-entity
-          gltf-model="#brain-model"
+          gltf-model="#astronaut-model"
           scale="0.1 0.1 0.1"
           position="0 0.5 0"
           rotation="-90 0 0"
@@ -26,24 +23,13 @@
       </a-marker>
 
 
-      <a-marker type="pattern" url="./assets/patt/nlp-element.patt">
-          <a-image 
-            src="#nlp-explanation" 
-            width="2" 
-            height="1.125" 
+      <a-marker type="pattern" url="./assets/Artificial_intelligence.patt">
+          <a-entity 
+            gltf-model="#frame-model"
+            scale="0.05 0.05 0.05"
+            position="0 0.5 0"
             rotation="-90 0 0">
-          </a-image>
-      </a-marker>
-
-      
-      <a-marker type="pattern" url="./assets/patt/ml-element.patt">
-          <a-video
-            src="#ai-overview-video"
-            width="2"
-            height="1.125"
-            rotation="-90 0 0"
-            position="0 0 0">
-          </a-video>
+          </a-entity>
       </a-marker>
 
 
