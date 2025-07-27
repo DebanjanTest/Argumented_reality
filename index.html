@@ -1,22 +1,41 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>AR Tap-to-Place on Poster</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-aframe.prod.js"></script>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Get references to the scene and the image target
+        const sceneEl = document.querySelector('a-scene');
+        const targetEntity = document.querySelector('#poster-target');
 
-    <style>
-      body {
-        margin: 0;
-      }
-      .a-canvas {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-      }
-    </style>
+        // This is the clickable plane that covers the poster
+        const clickablePlane = document.querySelector('#clickable-plane');
+        
+        // Listen for a click event on our invisible plane
+        clickablePlane.addEventListener('click', (event) => {
+          // Create a new entity for our object
+          const newObject = document.createElement('a-entity');
+          
+          // Set the 3D model and scale
+          newObject.setAttribute('gltf-model', 'url(https://cdn.glitch.global/d8c1ba14-2630-464a-9e11-536c459f37c3/astronaut.glb?v=1680138988241)');
+          newObject.setAttribute('scale', '0.1 0.1 0.1');
+
+          // Get the 3D position of the click on the plane
+          const clickPosition = event.detail.intersection.point;
+          newObject.setAttribute('position', clickPosition);
+
+          // Add the new object as a child of the image target
+          // This makes the object stick to the poster
+          targetEntity.appendChild(newObject);
+        });
+      });
+    </script>
   </head>
-
+  
   <body>
     <a-scene 
       mindar-image="imageTargetSrc: ./assets/targets.mind; uiScanning: yes; uiLoading: yes; uiError: yes;" 
@@ -24,32 +43,21 @@
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false">
+      
+      <a-camera position="0 0 0" look-controls="enabled: false">
+        <a-cursor fuse="false" raycaster="objects: .clickable"></a-cursor>
+      </a-camera>
 
-      <a-assets>
-        <a-asset-item id="astronaut-model" src="./assets/astronaut.glb"></a-asset-item>
-        <a-asset-item id="frame-model" src="./assets/picture-frame.glb"></a-asset-item>
-      </a-assets>
-
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model 
-          src="#astronaut-model" 
-          rotation="0 0 0" 
-          position="0 0 -1" 
-          scale="0.3 0.3 0.3">
-        </a-gltf-model>
+      <a-entity id="poster-target" mindar-image-target="targetIndex: 0">
+        <a-plane
+          id="clickable-plane"
+          class="clickable"
+          position="0 0 0"
+          height="1"
+          width="1"
+          opacity="0"
+        ></a-plane>
       </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 1">
-        <a-gltf-model 
-          src="#frame-model" 
-          rotation="0 0 0" 
-          position="0 0 -1" 
-          scale="0.3 0.3 0.3">
-        </a-gltf-model>
-      </a-entity>
-
     </a-scene>
   </body>
 </html>
