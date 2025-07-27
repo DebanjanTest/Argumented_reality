@@ -7,58 +7,118 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
-    <script>
-      // Defines the images for the automated slideshow
-      const slideshowImages = [
-        './assets/Slideshow/1.png',
-        './assets/Slideshow/2.png',
-        './assets/Slideshow/3.png',
-        './assets/Slideshow/4.png'
-      ];
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <style>
+      body { margin: 0; }
+      .a-canvas { height: 100%; width: 100%; position: absolute; }
       
+      /* Style for the download button */
+      #download-button {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 101; /* Make sure it's on top of the AR scene */
+        padding: 12px 24px;
+        font-size: 16px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+    </style>
+
+    <script>
+      const slideshowImages = [
+        './assets/Slideshow/1.png', './assets/Slideshow/2.png',
+        './assets/Slideshow/3.png', './assets/Slideshow/4.png'
+      ];
       let currentSlide = 0;
 
       document.addEventListener('DOMContentLoaded', () => {
+        const sceneEl = document.querySelector('a-scene');
         const slideshowPlane = document.querySelector('#slideshow-plane');
+        const downloadButton = document.querySelector('#download-button');
 
-        // Automated slideshow logic
+        // --- Download Logic ---
+        const filesToZip = [
+          './assets/poster.png', // Main poster image
+          './assets/elements/Artificial_intelligence.png',
+          './assets/elements/Deep_Learning.png',
+          './assets/elements/Machine_learning.png',
+          './assets/elements/Neural_networks.png'
+        ];
+
+        downloadButton.addEventListener('click', async () => {
+          downloadButton.textContent = 'Zipping...';
+          const zip = new JSZip();
+
+          for (const path of filesToZip) {
+            try {
+              const response = await fetch(path);
+              const blob = await response.blob();
+              const filename = path.split('/').pop(); // Extracts filename from path
+              zip.file(filename, blob);
+            } catch (error) {
+              console.error('Error fetching file:', path, error);
+            }
+          }
+
+          zip.generateAsync({type:"blob"}).then(function(content) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = 'AI_Poster_Assets.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            downloadButton.textContent = 'Download Assets';
+          });
+        });
+
+
+        // --- Screen-fixed Image Logic ---
+        const elementPlanes = {
+          1: document.querySelector('#element-plane-1'), 2: document.querySelector('#element-plane-2'),
+          3: document.querySelector('#element-plane-3'), 4: document.querySelector('#element-plane-4'),
+        };
+        sceneEl.addEventListener('targetFound', e => elementPlanes[e.detail.targetIndex]?.setAttribute('visible', 'true'));
+        sceneEl.addEventListener('targetLost', e => elementPlanes[e.detail.targetIndex]?.setAttribute('visible', 'false'));
+
+
+        // --- Automated Slideshow Logic ---
         const nextSlide = () => {
             currentSlide = (currentSlide + 1) % slideshowImages.length;
             slideshowPlane.setAttribute('material', 'src', slideshowImages[currentSlide]);
         };
-        
-        // Change slide every 5 seconds
         setInterval(nextSlide, 5000);
       });
     </script>
   </head>
   
   <body>
+    <button id="download-button">Download Assets</button>
+
     <a-scene 
       mindar-image="imageTargetSrc: ./assets/targets.mind; maxTrack: 5; uiScanning: yes; uiLoading: yes; uiError: yes;"
       color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false">
+        <a-plane id="element-plane-1" visible="false" material="src: ./assets/elements/Artificial_intelligence.png" position="0 0 -2" height="1.41" width="1"></a-plane>
+        <a-plane id="element-plane-2" visible="false" material="src: ./assets/elements/Deep_Learning.png" position="0 0 -2" height="1.41" width="1"></a-plane>
+        <a-plane id="element-plane-3" visible="false" material="src: ./assets/elements/Machine_learning.png" position="0 0 -2" height="1.41" width="1"></a-plane>
+        <a-plane id="element-plane-4" visible="false" material="src: ./assets/elements/Neural_networks.png" position="0 0 -2" height="1.41" width="1"></a-plane>
+      </a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-plane id="slideshow-plane" material="src: ./assets/Slideshow/1.png" position="0 0 0" height="1" width="2"></a-plane>
+        <a-plane id="slideshow-plane" material="src: ./assets/Slideshow/1.png" position="0 0 0" height="0.8" width="1.2"></a-plane>
       </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 1">
-        <a-plane material="src: ./assets/elements/Artificial_intelligence.png" position="0 0 0" height="1.41" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 2">
-        <a-plane material="src: ./assets/elements/Deep_Learning.png" position="0 0 0" height="1.41" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 3">
-        <a-plane material="src: ./assets/elements/Machine_learning.png" position="0 0 0" height="1.41" width="1"></a-plane>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 4">
-        <a-plane material="src: ./assets/elements/Neural_networks.png" position="0 0 0" height="1.41" width="1"></a-plane>
-      </a-entity>
+      <a-entity mindar-image-target="targetIndex: 1"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 2"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 3"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 4"></a-entity>
     </a-scene>
   </body>
 </html>
