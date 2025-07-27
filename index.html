@@ -14,6 +14,7 @@
         top: 0; left: 0;
         width: 100%; height: 100%;
         background-color: rgba(0, 0, 0, 0.95);
+        display: none; /* Hidden by default */
         justify-content: center;
         align-items: center;
         z-index: 100;
@@ -46,35 +47,36 @@
         const overlayImage = document.querySelector('#overlay-image');
         const slideshowPlane = document.querySelector('#slideshow-plane');
 
-        // --- CHANGE: Logic to handle back button press ---
-        // This function hides the overlay and shows the AR scene.
+        // Hides the overlay and shows the AR scene.
         const goBackToAR = () => {
             imageOverlay.style.display = 'none';
             sceneEl.style.display = 'block';
         };
 
-        // Listen for the browser's back button
+        // Listen for the browser's back button press.
         window.addEventListener('popstate', goBackToAR);
 
+        // Listen for when a marker is found.
         sceneEl.addEventListener('targetFound', event => {
           const targetIndex = event.detail.targetIndex;
           if (elementImages[targetIndex]) {
-            // Set the image and show the overlay
+            // Set the image and show the overlay.
             overlayImage.src = elementImages[targetIndex];
             imageOverlay.style.display = 'flex';
             sceneEl.style.display = 'none';
             
-            // Add a state to the browser history to enable the back button
+            // Add a state to the browser history to enable the back button.
             history.pushState(null, '', '#image');
           }
         });
 
-        // Automated slideshow logic
+        // Automated slideshow logic.
         const nextSlide = () => {
             currentSlide = (currentSlide + 1) % slideshowImages.length;
             slideshowPlane.setAttribute('material', 'src', slideshowImages[currentSlide]);
         };
         
+        // Change slide every 5 seconds.
         setInterval(nextSlide, 5000);
       });
     </script>
