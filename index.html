@@ -1,49 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>AR Multi-Target Tap-to-Place</title>
+    <title>AR Multi-Marker Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      body {
-        margin: 0;
-      }
-      .a-canvas {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-      }
+      body { margin: 0; }
+      .a-canvas { height: 100%; width: 100%; position: absolute; }
     </style>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const sceneEl = document.querySelector('a-scene');
-        const targetEntity = document.querySelector('#poster-target-0');
-
-        // This event listener is attached to the whole scene now
-        sceneEl.addEventListener('click', (event) => {
-          // We only want to place objects if the main poster is visible
-          if (targetEntity.getAttribute('visible')) {
-            // Check if the click was on the clickable plane
-            const clickedEl = event.detail.intersectedEl;
-            if (clickedEl && clickedEl.classList.contains('clickable')) {
-              const newObject = document.createElement('a-entity');
-              
-              newObject.setAttribute('gltf-model', 'url(https://cdn.glitch.global/d8c1ba14-2630-464a-9e11-536c459f37c3/astronaut.glb?v=1680138988241)');
-              newObject.setAttribute('scale', '0.1 0.1 0.1');
-
-              const clickPosition = event.detail.intersection.point;
-              newObject.setAttribute('position', clickPosition);
-
-              targetEntity.appendChild(newObject);
-            }
-          }
-        });
-      });
-    </script>
   </head>
   
   <body>
@@ -54,24 +21,16 @@
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false">
       
-      <a-camera position="0 0 0" look-controls="enabled: false">
-        <a-cursor fuse="false" raycaster="objects: .clickable"></a-cursor>
-      </a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity id="poster-target-0" mindar-image-target="targetIndex: 0">
-        <a-plane
-          class="clickable"
-          position="0 0 0"
-          height="1"
-          width="1"
-          opacity="0"
-        ></a-plane>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane color="skyblue" opacity="0.7" position="0 0 0" height="1" width="1" rotation="0 0 0"></a-plane>
+        <a-text value="Marker 1" color="black" align="center" position="0 0.6 0"></a-text>
       </a-entity>
 
-      <a-entity id="poster-target-1" mindar-image-target="targetIndex: 1">
-        <a-box position="0 0.25 0" material="color: red;">
-            <a-animation attribute="rotation" to="0 360 0" dur="2000" loop="true" easing="linear"></a-animation>
-        </a-box>
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-plane color="lightgreen" opacity="0.7" position="0 0 0" height="1" width="1" rotation="0 0 0"></a-plane>
+        <a-text value="Marker 2" color="black" align="center" position="0 0.6 0"></a-text>
       </a-entity>
 
     </a-scene>
