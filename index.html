@@ -7,88 +7,35 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
-    <style>
-      /* Styles for the full-page image overlay */
-      #image-overlay {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background-color: rgba(0, 0, 0, 0.95);
-        display: none; /* Hidden by default */
-        justify-content: center;
-        align-items: center;
-        z-index: 100;
-      }
-      #image-overlay img {
-        max-width: 90%;
-        max-height: 90%;
-      }
-    </style>
-
     <script>
+      // Defines the images for the automated slideshow
       const slideshowImages = [
         './assets/Slideshow/1.png',
         './assets/Slideshow/2.png',
         './assets/Slideshow/3.png',
         './assets/Slideshow/4.png'
       ];
-      const elementImages = {
-        1: './assets/Slideshow/1.png',
-        2: './assets/elements/Deep_Learning.png',
-        3: './assets/elements/Machine_learning.png',
-        4: './assets/elements/Neural_networks.png'
-      };
       
       let currentSlide = 0;
 
       document.addEventListener('DOMContentLoaded', () => {
-        const sceneEl = document.querySelector('a-scene');
-        const imageOverlay = document.querySelector('#image-overlay');
-        const overlayImage = document.querySelector('#overlay-image');
         const slideshowPlane = document.querySelector('#slideshow-plane');
 
-        // Hides the overlay and shows the AR scene.
-        const goBackToAR = () => {
-            imageOverlay.style.display = 'none';
-            sceneEl.style.display = 'block';
-        };
-
-        // Listen for the browser's back button press.
-        window.addEventListener('popstate', goBackToAR);
-
-        // Listen for when a marker is found.
-        sceneEl.addEventListener('targetFound', event => {
-          const targetIndex = event.detail.targetIndex;
-          if (elementImages[targetIndex]) {
-            // Set the image and show the overlay.
-            overlayImage.src = elementImages[targetIndex];
-            imageOverlay.style.display = 'flex';
-            sceneEl.style.display = 'none';
-            
-            // Add a state to the browser history to enable the back button.
-            history.pushState(null, '', '#image');
-          }
-        });
-
-        // Automated slideshow logic.
+        // Automated slideshow logic
         const nextSlide = () => {
             currentSlide = (currentSlide + 1) % slideshowImages.length;
             slideshowPlane.setAttribute('material', 'src', slideshowImages[currentSlide]);
         };
         
-        // Change slide every 5 seconds.
+        // Change slide every 5 seconds
         setInterval(nextSlide, 5000);
       });
     </script>
   </head>
   
   <body>
-    <div id="image-overlay">
-      <img id="overlay-image" src="" />
-    </div>
-
     <a-scene 
-      mindar-image="imageTargetSrc: ./assets/targets.mind; maxTrack: 1; uiScanning: yes; uiLoading: yes; uiError: yes;"
+      mindar-image="imageTargetSrc: ./assets/targets.mind; maxTrack: 5; uiScanning: yes; uiLoading: yes; uiError: yes;"
       color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -97,10 +44,9 @@
         <a-plane id="slideshow-plane" material="src: ./assets/Slideshow/1.png" position="0 0 0" height="0.8" width="1.2"></a-plane>
       </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 1"></a-entity>
-      <a-entity mindar-image-target="targetIndex: 2"></a-entity>
-      <a-entity mindar-image-target="targetIndex: 3"></a-entity>
-      <a-entity mindar-image-target="targetIndex: 4"></a-entity>
-    </a-scene>
-  </body>
-</html>
+      <a-entity mindar-image-target="targetIndex: 1">
+        <a-plane material="src: ./assets/elements/Artificial_intelligence.png" position="0 0 0" height="1" width="1"></a-plane>
+      </a-entity>
+
+      <a-entity mindar-image-target="targetIndex: 2">
+        <a-plane material="src: ./assets/elements/Deep_Learning.png" position="0 0 0" height="1" width="1"></a
