@@ -1,53 +1,125 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>AR 5-Marker Test</title>
+    <title>AR Interactive Poster</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-      body { margin: 0; }
-      .a-canvas { height: 100%; width: 100%; position: absolute; }
+      /* Styles for the full-page image overlay */
+      #image-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: none; /* Hidden by default */
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+      }
+      #image-overlay img {
+        max-width: 90%;
+        max-height: 90%;
+      }
+      #close-button {
+        position: absolute;
+        top: 20px; right: 20px;
+        font-size: 24px;
+        background: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px; height: 40px;
+        cursor: pointer;
+      }
     </style>
+
+    <script>
+      // --- CHANGED SECTION: Updated to match your file names ---
+      const slideshowImages = [
+        './assets/Slideshow/1.png',
+        './assets/Slideshow/2.png',
+        './assets/Slideshow/3.png',
+        './assets/Slideshow/4.png'
+      ];
+      const elementImages = {
+        1: './assets/elements/Artificial_intelligence.png',
+        2: './assets/elements/Deep_Learning.png',
+        3: './assets/elements/Machine_learning.png',
+        4: './assets/elements/Neural_networks.png'
+      };
+      // --- END CHANGED SECTION ---
+
+      let currentSlide = 0;
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const sceneEl = document.querySelector('a-scene');
+        const imageOverlay = document.querySelector('#image-overlay');
+        const overlayImage = document.querySelector('#overlay-image');
+        const closeButton = document.querySelector('#close-button');
+
+        closeButton.addEventListener('click', () => {
+          imageOverlay.style.display = 'none';
+          sceneEl.style.display = 'block';
+        });
+        
+        sceneEl.addEventListener('targetFound', event => {
+          const targetIndex = event.detail.targetIndex;
+          if (elementImages[targetIndex]) {
+            overlayImage.src = elementImages[targetIndex];
+            imageOverlay.style.display = 'flex';
+            sceneEl.style.display = 'none';
+          }
+        });
+
+        const slideshowPlane = document.querySelector('#slideshow-plane');
+        const nextButton = document.querySelector('#next-button');
+        const prevButton = document.querySelector('#prev-button');
+        
+        const updateSlideshowImage = () => {
+          slideshowPlane.setAttribute('material', 'src', slideshowImages[currentSlide]);
+        };
+
+        nextButton.addEventListener('click', () => {
+          currentSlide = (currentSlide + 1) % slideshowImages.length;
+          updateSlideshowImage();
+        });
+
+        prevButton.addEventListener('click', () => {
+          currentSlide = (currentSlide - 1 + slideshowImages.length) % slideshowImages.length;
+          updateSlideshowImage();
+        });
+      });
+    </script>
   </head>
   
   <body>
+    <div id="image-overlay">
+      <button id="close-button">X</button>
+      <img id="overlay-image" src="" />
+    </div>
+
     <a-scene 
-      mindar-image="imageTargetSrc: ./assets/targets.mind; maxTrack: 5; uiScanning: yes; uiLoading: yes; uiError: yes;" 
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights" 
-      vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: false">
+      mindar-image="imageTargetSrc: ./assets/targets.mind; maxTrack: 1; uiScanning: yes; uiLoading: yes; uiError: yes;"
+      color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false">
+        <a-cursor raycaster="objects: .clickable"></a-cursor>
+      </a-camera>
 
-      <a-entity mindar-image-target="targetIndex: 4">
-        <a-plane color="white" opacity="0.7" position="0 0 0" height="1.41" width="1" rotation="0 0 0"></a-plane>
-        <a-text value="Full Poster Detected" color="black" align="center" position="0 0.8 0" width="2"></a-text>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-plane id="slideshow-plane" material="src: ./assets/Slideshow/1.png" position="0 0 0" height="0.8" width="1.2"></a-plane>
+        
+        <a-triangle id="prev-button" class="clickable" color="white" opacity="0.8" vertex-c="0 0 0" vertex-a="-0.15 0.1 0" vertex-b="-0.15 -0.1 0" position="-0.75 0 0"></a-triangle>
+        
+        <a-triangle id="next-button" class="clickable" color="white" opacity="0.8" vertex-c="0 0 0" vertex-a="0.15 0.1 0" vertex-b="0.15 -0.1 0" position="0.75 0 0" rotation="0 0 180"></a-triangle>
       </a-entity>
 
-      <a-entity mindar-image-target="targetIndex: 1">
-        <a-plane color="skyblue" opacity="0.7" position="0 0 0" height="1" width="1" rotation="0 0 0"></a-plane>
-        <a-text value="Marker 1" color="black" align="center" position="0 0.6 0" width="2"></a-text>
-      </a-entity>
-      
-      <a-entity mindar-image-target="targetIndex: 2">
-        <a-plane color="lightgreen" opacity="0.7" position="0 0 0" height="1" width="1" rotation="0 0 0"></a-plane>
-        <a-text value="Marker 2" color="black" align="center" position="0 0.6 0" width="2"></a-text>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 3">
-        <a-plane color="orange" opacity="0.7" position="0 0 0" height="1" width="1" rotation="0 0 0"></a-plane>
-        <a-text value="Marker 3" color="black" align="center" position="0 0.6 0" width="2"></a-text>
-      </a-entity>
-
-      <a-entity mindar-image-target="targetIndex: 1">
-        <a-plane color="pink" opacity="0.7" position="0 0 0" height="1" width="1" rotation="0 0 0"></a-plane>
-        <a-text value="Marker 4" color="black" align="center" position="0 0.6 0" width="2"></a-text>
-      </a-entity>
-
+      <a-entity mindar-image-target="targetIndex: 1"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 2"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 3"></a-entity>
+      <a-entity mindar-image-target="targetIndex: 4"></a-entity>
     </a-scene>
   </body>
 </html>
