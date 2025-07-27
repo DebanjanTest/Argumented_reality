@@ -36,7 +36,6 @@
     </style>
 
     <script>
-      // --- CHANGED SECTION: Updated to match your file names ---
       const slideshowImages = [
         './assets/Slideshow/1.png',
         './assets/Slideshow/2.png',
@@ -49,8 +48,7 @@
         3: './assets/elements/Machine_learning.png',
         4: './assets/elements/Neural_networks.png'
       };
-      // --- END CHANGED SECTION ---
-
+      
       let currentSlide = 0;
 
       document.addEventListener('DOMContentLoaded', () => {
@@ -58,38 +56,35 @@
         const imageOverlay = document.querySelector('#image-overlay');
         const overlayImage = document.querySelector('#overlay-image');
         const closeButton = document.querySelector('#close-button');
+        const slideshowPlane = document.querySelector('#slideshow-plane');
 
+        // --- FIX: Logic to handle full-page image display ---
         closeButton.addEventListener('click', () => {
           imageOverlay.style.display = 'none';
-          sceneEl.style.display = 'block';
+          sceneEl.style.display = 'block'; // Make sure the AR scene is visible again
         });
         
         sceneEl.addEventListener('targetFound', event => {
           const targetIndex = event.detail.targetIndex;
           if (elementImages[targetIndex]) {
+            // Set the correct image source for the overlay
             overlayImage.src = elementImages[targetIndex];
-            imageOverlay.style.display = 'flex';
-            sceneEl.style.display = 'none';
+            // Show the overlay and hide the AR scene, only if the overlay isn't already visible
+            if (imageOverlay.style.display !== 'flex') {
+                imageOverlay.style.display = 'flex';
+                sceneEl.style.display = 'none';
+            }
           }
         });
 
-        const slideshowPlane = document.querySelector('#slideshow-plane');
-        const nextButton = document.querySelector('#next-button');
-        const prevButton = document.querySelector('#prev-button');
-        
-        const updateSlideshowImage = () => {
-          slideshowPlane.setAttribute('material', 'src', slideshowImages[currentSlide]);
+        // --- CHANGE: Logic for automated slideshow ---
+        const nextSlide = () => {
+            currentSlide = (currentSlide + 1) % slideshowImages.length;
+            slideshowPlane.setAttribute('material', 'src', slideshowImages[currentSlide]);
         };
-
-        nextButton.addEventListener('click', () => {
-          currentSlide = (currentSlide + 1) % slideshowImages.length;
-          updateSlideshowImage();
-        });
-
-        prevButton.addEventListener('click', () => {
-          currentSlide = (currentSlide - 1 + slideshowImages.length) % slideshowImages.length;
-          updateSlideshowImage();
-        });
+        
+        // Start the automatic slideshow timer
+        setInterval(nextSlide, 5000); // 5000 milliseconds = 5 seconds
       });
     </script>
   </head>
@@ -104,16 +99,10 @@
       mindar-image="imageTargetSrc: ./assets/targets.mind; maxTrack: 1; uiScanning: yes; uiLoading: yes; uiError: yes;"
       color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
-      <a-camera position="0 0 0" look-controls="enabled: false">
-        <a-cursor raycaster="objects: .clickable"></a-cursor>
-      </a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
         <a-plane id="slideshow-plane" material="src: ./assets/Slideshow/1.png" position="0 0 0" height="0.8" width="1.2"></a-plane>
-        
-        <a-triangle id="prev-button" class="clickable" color="white" opacity="0.8" vertex-c="0 0 0" vertex-a="-0.15 0.1 0" vertex-b="-0.15 -0.1 0" position="-0.75 0 0"></a-triangle>
-        
-        <a-triangle id="next-button" class="clickable" color="white" opacity="0.8" vertex-c="0 0 0" vertex-a="0.15 0.1 0" vertex-b="0.15 -0.1 0" position="0.75 0 0" rotation="0 0 180"></a-triangle>
       </a-entity>
 
       <a-entity mindar-image-target="targetIndex: 1"></a-entity>
