@@ -1,36 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>AR Tap-to-Place on Poster</title>
+    <title>AR Multi-Target Tap-to-Place</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
+    <style>
+      body {
+        margin: 0;
+      }
+      .a-canvas {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+    </style>
+
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        // Get references to the scene and the image target
         const sceneEl = document.querySelector('a-scene');
-        const targetEntity = document.querySelector('#poster-target');
+        const targetEntity = document.querySelector('#poster-target-0');
 
-        // This is the clickable plane that covers the poster
-        const clickablePlane = document.querySelector('#clickable-plane');
-        
-        // Listen for a click event on our invisible plane
-        clickablePlane.addEventListener('click', (event) => {
-          // Create a new entity for our object
-          const newObject = document.createElement('a-entity');
-          
-          // Set the 3D model and scale
-          newObject.setAttribute('gltf-model', 'url(https://cdn.glitch.global/d8c1ba14-2630-464a-9e11-536c459f37c3/astronaut.glb?v=1680138988241)');
-          newObject.setAttribute('scale', '0.1 0.1 0.1');
+        // This event listener is attached to the whole scene now
+        sceneEl.addEventListener('click', (event) => {
+          // We only want to place objects if the main poster is visible
+          if (targetEntity.getAttribute('visible')) {
+            // Check if the click was on the clickable plane
+            const clickedEl = event.detail.intersectedEl;
+            if (clickedEl && clickedEl.classList.contains('clickable')) {
+              const newObject = document.createElement('a-entity');
+              
+              newObject.setAttribute('gltf-model', 'url(https://cdn.glitch.global/d8c1ba14-2630-464a-9e11-536c459f37c3/astronaut.glb?v=1680138988241)');
+              newObject.setAttribute('scale', '0.1 0.1 0.1');
 
-          // Get the 3D position of the click on the plane
-          const clickPosition = event.detail.intersection.point;
-          newObject.setAttribute('position', clickPosition);
+              const clickPosition = event.detail.intersection.point;
+              newObject.setAttribute('position', clickPosition);
 
-          // Add the new object as a child of the image target
-          // This makes the object stick to the poster
-          targetEntity.appendChild(newObject);
+              targetEntity.appendChild(newObject);
+            }
+          }
         });
       });
     </script>
@@ -38,7 +48,7 @@
   
   <body>
     <a-scene 
-      mindar-image="imageTargetSrc: ./assets/targets.mind; uiScanning: yes; uiLoading: yes; uiError: yes;" 
+      mindar-image="imageTargetSrc: ./assets/targets.mind; maxTrack: 2; uiScanning: yes; uiLoading: yes; uiError: yes;" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
@@ -48,9 +58,8 @@
         <a-cursor fuse="false" raycaster="objects: .clickable"></a-cursor>
       </a-camera>
 
-      <a-entity id="poster-target" mindar-image-target="targetIndex: 0">
+      <a-entity id="poster-target-0" mindar-image-target="targetIndex: 0">
         <a-plane
-          id="clickable-plane"
           class="clickable"
           position="0 0 0"
           height="1"
@@ -58,6 +67,13 @@
           opacity="0"
         ></a-plane>
       </a-entity>
+
+      <a-entity id="poster-target-1" mindar-image-target="targetIndex: 1">
+        <a-box position="0 0.25 0" material="color: red;">
+            <a-animation attribute="rotation" to="0 360 0" dur="2000" loop="true" easing="linear"></a-animation>
+        </a-box>
+      </a-entity>
+
     </a-scene>
   </body>
 </html>
