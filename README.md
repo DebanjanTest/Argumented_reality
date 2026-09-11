@@ -172,9 +172,3 @@ If you update or redesign the poster:
 - [MindAR.js](https://github.com/hiukim/mind-ar-js) - Web Augmented Reality engine for image tracking.
 - [A-Frame](https://aframe.io/) - Web framework for building 3D and AR/VR experiences.
 - [JSZip](https://stuk.github.io/jszip/) - Client-side ZIP file generation and compression.
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
